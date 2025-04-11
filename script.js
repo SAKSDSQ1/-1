@@ -21,7 +21,7 @@ function submitLetter() {
 
   const deviceInfo = navigator.userAgent;
 
-  fetch("https://ipinfo.io/json?token=YOUR_TOKEN_HERE")  // <-- 여기에 API 토큰 입력
+  fetch("https://ipinfo.io/json?token=27854d1235c512")  // <-- 여기에 API 토큰 입력
     .then(response => response.json())
     .then(location => {
       const cityInfo = `${location.city || "Unknown City"}, ${location.country || "Unknown Country"}`;
